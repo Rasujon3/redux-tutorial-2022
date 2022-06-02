@@ -1,15 +1,10 @@
 // defining constants
 const INCREMENT = "INCREMENT";
 const DECREMENT = "DECREMENT";
-const ADD_USER = "ADD_USER";
 
 // state
 const initialCounterState = {
   count: 0,
-};
-
-const initialUsersState = {
-  users: [{ name: "anisul islam" }],
 };
 
 // action - Object -> i. type, ii. payload
@@ -27,14 +22,31 @@ const decrementCounter = () => {
   };
 };
 
-const addUser = () => {
-  return {
-    type: ADD_USER,
-    payload: { name: "shakil" },
-  };
-};
+// create reducer for counter
+// reducer = pure function(je function input niye definatly output return kore)
+// reducer er kaj = ja ja logic ase, ta handle kore, state update kora
+// update korbe kar upor base kore?=action er type er upor based kore
+// reducer = pure function, logic handle krbe action type er upor vitti kore
 
-// incrementCounter()
+const counterReducer = (state = initialCounterState, action) => {
+  switch (action.type) {
+    case INCREMENT:
+      return {
+        ...state,
+        count: state.count + 1,
+      };
+
+    case DECREMENT:
+      return {
+        ...state,
+        count: state.count - 1,
+      };
+
+    default:
+      state;
+      break;
+  }
+};
 
 // 1. state
 // 2. dispatch -> action
