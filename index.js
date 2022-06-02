@@ -1,112 +1,107 @@
-// plan
-// state - count:0
-// action - increment, decrement, reset
-// reducer
+// productReducer
+
+const { createStore, combineReducers } = require("redux");
+
+// product Constant
+const GET_PRODUCTS = "GET_PRODUCTS";
+const ADD_PRODUCTS = "ADD_PRODUCTS";
+
+// cart Constant
+const GET_CART_ITEMS = "GET_CART_ITEMS";
+const ADD_CART_ITEM = "ADD_CART_ITEM";
+
+// Product states
+const initialProductState = {
+  products: ["sugar", "salt"],
+  numberOfProducts: 2,
+};
+
+// Cart states
+const initialCartState = {
+  cart: ["sugar"],
+  numberOfProducts: 1,
+};
+
+// product actions
+const getProducts = () => {
+  return {
+    type: GET_PRODUCTS,
+  };
+};
+
+const addProduct = (product) => {
+  return {
+    type: ADD_PRODUCTS,
+    payload: product,
+  };
+};
+
+// cart actions
+const getCart = () => {
+  return {
+    type: GET_CART_ITEMS,
+  };
+};
+
+const addCart = (cart) => {
+  return {
+    type: ADD_CART_ITEM,
+    payload: cart,
+  };
+};
+
+// productReducer
+const productReducer = (state = initialProductState, action) => {
+  switch (action.type) {
+    case GET_PRODUCTS:
+      return {
+        ...state,
+      };
+    case ADD_PRODUCTS:
+      return {
+        products: [...state.products, action.payload],
+        numberOfProducts: state.numberOfProducts + 1,
+      };
+
+    default:
+      return state;
+  }
+};
+
+// cartReducer
+const cartReducer = (state = initialCartState, action) => {
+  switch (action.type) {
+    case GET_CART_ITEMS:
+      return {
+        ...state,
+      };
+    case ADD_CART_ITEM:
+      return {
+        cart: [...state.cart, action.payload],
+        numberOfProducts: state.numberOfProducts + 1,
+      };
+
+    default:
+      return state;
+  }
+};
+
+// rootReducer
+
+const rootReducer = combineReducers({
+  productR: productReducer,
+  cartR: cartReducer,
+});
+
 // store
-
-const { createStore } = require("redux");
-
-// CONSTANT
-const INCREMENT = "INCREMENT";
-const DECREMENT = "DECREMENT";
-const RESET = "RESET";
-const INCREMENT_BY_VALUE = "INCREMENT_BY_VALUE";
-const ADD_USER = "ADD_USER";
-
-const initialState = {
-  users: ["anis"],
-  count: 1,
-};
-
-const addUser = (user) => {
-  return {
-    type: ADD_USER,
-    payload: user,
-  };
-};
-const incrementCounterAction = () => {
-  return {
-    type: INCREMENT,
-  };
-};
-const decrementCounterAction = () => {
-  return {
-    type: DECREMENT,
-  };
-};
-const resetCounterAction = () => {
-  return {
-    type: RESET,
-  };
-};
-const incrementCounterByValue = (value) => {
-  return {
-    type: INCREMENT_BY_VALUE,
-    payload: value,
-  };
-};
-
-// CREATING RESUCER
-const counterReducer = (state = initialState, action) => {
-  switch (action.type) {
-    case INCREMENT:
-      return {
-        ...state,
-        count: state.count + 1,
-      };
-    case DECREMENT:
-      return {
-        ...state,
-        count: state.count - 1,
-      };
-    case RESET:
-      return {
-        ...state,
-        count: 0,
-      };
-    case INCREMENT_BY_VALUE:
-      return {
-        ...state,
-        count: state.count + action.payload,
-      };
-
-    default:
-      state;
-  }
-};
-
-const userReducer = (state = initialState, action) => {
-  switch (action.type) {
-    case ADD_USER:
-      return {
-        users: [...state.users, action.payload],
-        count: state.count + 1,
-      };
-
-    default:
-      state;
-  }
-};
-
-// STORE
-const store = createStore(counterReducer);
-const store2 = createStore(userReducer);
-
+// const store = createStore(productReducer);
+const store = createStore(rootReducer);
 store.subscribe(() => {
   console.log(store.getState());
 });
 
-store2.subscribe(() => {
-  console.log(store2.getState());
-});
+store.dispatch(getProducts());
+store.dispatch(addProduct("pen"));
 
-// store.dispatch(incrementCounterAction());
-// store.dispatch(incrementCounterAction());
-// store.dispatch(incrementCounterAction());
-// store.dispatch(decrementCounterAction());
-// store.dispatch(resetCounterAction());
-// store.dispatch(incrementCounterAction());
-// store.dispatch(incrementCounterByValue(5));
-// store.dispatch(incrementCounterByValue(10));
-store2.dispatch(addUser("rafique"));
-store2.dispatch(addUser("salma"));
+store.dispatch(getCart());
+store.dispatch(addCart("pen"));
