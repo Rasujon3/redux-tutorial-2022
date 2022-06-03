@@ -1,43 +1,67 @@
-// productReducer
+/**
+ * async actions - api calling
+ * api url - https://jsonplaceholder.typicode.com/todos
+ * middleware - redux-thunk
+ * axios api
+ */
 
+const { default: axios } = require("axios");
 const { createStore, applyMiddleware } = require("redux");
-const { default: logger } = require("redux-logger");
+const { default: thunk } = require("redux-thunk");
 
-// product Constant
-const GET_PRODUCTS = "GET_PRODUCTS";
-const ADD_PRODUCTS = "ADD_PRODUCTS";
+// constants
+const GET_TODOS_REQUEST = "GET_TODOS_REQUEST";
+const GET_TODOS_SUCCESS = "GET_TODOS_SUCCESS";
+const GET_TODOS_FAILED = "GET_TODOS_FAILED";
+const API_URL = "https://jsonplaceholder.typicode.com/todo";
 
-// Product states
-const initialProductState = {
-  products: ["sugar", "salt"],
-  numberOfProducts: 2,
+// state
+const initialTodosState = {
+  todos: [],
+  isLoading: false,
+  error: null,
 };
 
-// product actions
-const getProducts = () => {
+// actions
+const getTodosRequest = () => {
   return {
-    type: GET_PRODUCTS,
+    type: GET_TODOS_REQUEST,
   };
 };
 
-const addProduct = (product) => {
+const getTodosFailed = (error) => {
   return {
-    type: ADD_PRODUCTS,
-    payload: product,
+    type: GET_TODOS_FAILED,
+    payload: error,
   };
 };
 
-// productReducer
-const productReducer = (state = initialProductState, action) => {
+const getTodosSuccess = (todos) => {
+  return {
+    type: GET_TODOS_SUCCESS,
+    payload: todos,
+  };
+};
+
+// reducer
+const todosReducer = (state = initialTodosState, action) => {
   switch (action.type) {
-    case GET_PRODUCTS:
+    case GET_TODOS_REQUEST:
       return {
         ...state,
+        isLoading: true,
       };
-    case ADD_PRODUCTS:
+    case GET_TODOS_SUCCESS:
       return {
-        products: [...state.products, action.payload],
-        numberOfProducts: state.numberOfProducts + 1,
+        ...state,
+        isLoading: false,
+        todos: action.payload,
+      };
+    case GET_TODOS_FAILED:
+      return {
+        ...state,
+        isLoading: false,
+        error: action.payload,
       };
 
     default:
@@ -45,11 +69,29 @@ const productReducer = (state = initialProductState, action) => {
   }
 };
 
+// async action creator
+const fetchData = () => {
+  return (dispatch) => {
+    dispatch(getTodosRequest());
+    axios
+      .get(API_URL)
+      .then((res) => {
+        const todos = res.data;
+        const titles = todos.map((todo) => todo.title);
+        dispatch(getTodosSuccess(titles));
+      })
+      .catch((error) => {
+        const errorMessage = error.message;
+        dispatch(getTodosFailed(errorMessage));
+      });
+  };
+};
+
 // store
-const store = createStore(productReducer, applyMiddleware(logger));
+const store = createStore(todosReducer, applyMiddleware(thunk));
+
 store.subscribe(() => {
   console.log(store.getState());
 });
 
-store.dispatch(getProducts());
-store.dispatch(addProduct("pen"));
+store.dispatch(fetchData());
